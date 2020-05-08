@@ -2,17 +2,53 @@ const inquirer = require("inquirer");
 const chalk = require("chalk");
 const colors = require("./utils/colors");
 const introOptions = require("./introOptions");
-// const green = chalk.green;
-const log = console.log;
+const cheatSheet = require("./cheatSheet");
 
-const questions = [
-  {
-    type: "input",
+const intro = {
+    type: "list",
     name: "intro",
     message: "What would you like to do?",
-    default: false,
-  },
-];
+    choices: [
+        "Check installed packages",
+        "Install server packages",
+        "Uninstall server packages",
+        "Full server setup",
+        "Cheat sheet",
+        "Quit",
+    ],
+};
+const mainMenuQuestion = {
+    type: "list",
+    name: "intro",
+    message: "What would you like to do?",
+    choices: [
+        "Check installed packages",
+        "Cheat sheet",
+        "Install server packages",
+        "Uninstall server packages",
+        "Full server setup",
+        "Quit",
+    ],
+};
+
+const mainMenuPrompt = (question) => {
+    return inquirer.prompt(question).then((answer) => {
+        switch (answer.intro) {
+            case "Check installed packages":
+                introOptions.checkInstalled();
+                mainMenuPrompt(mainMenuQuestion);
+                break;
+            case "Cheat sheet":
+                cheatSheet();
+                mainMenuPrompt(mainMenuQuestion);
+                break;
+            case "Quit":
+                break;
+        }
+    });
+};
+
+mainMenuPrompt(mainMenuQuestion);
 
 // function green(string) {
 //   if (typeof string == "object") {
@@ -21,22 +57,16 @@ const questions = [
 //   } else log(chalk.green(string));
 // }
 
-const intro = {
-  type: "list",
-  name: "intro",
-  message: "What would you like to do?",
-  choices: [
-    "Check installed packages",
-    "Install server packages",
-    "Uninstall server packages",
-    "Full server setup",
-  ],
-};
-
-inquirer.prompt(intro).then((answer) => {
-  colors.green(answer);
-  if (answer.intro === "Check installed packages") {
-    console.log("---->");
-    introOptions.checkInstalled();
-  }
-});
+// inquirer.prompt(intro).then((answer) => {
+//     colors.green(answer);
+//     while (answer.intro != "Quit") {
+//         switch (answer.intro) {
+//             case "Check installed packages":
+//                 introOptions.checkInstalled();
+//                 break;
+//             case "Cheat sheet":
+//                 cheatSheet();
+//                 break;
+//         }
+//     }
+// });
