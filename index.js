@@ -3,70 +3,64 @@ const chalk = require("chalk");
 const colors = require("./utils/colors");
 const introOptions = require("./introOptions");
 const cheatSheet = require("./cheatSheet");
+const aboutOption = require("./about");
+const configuration = require("./configuration");
 
-const intro = {
-    type: "list",
-    name: "intro",
-    message: "What would you like to do?",
-    choices: [
-        "Check installed packages",
-        "Install server packages",
-        "Uninstall server packages",
-        "Full server setup",
-        "Cheat sheet",
-        "Quit",
-    ],
-};
+const mainMenuChoices = [
+    "Check installed packages",
+    "Configuration",
+    // "Install server packages".gray,
+    // "Uninstall server packages".gray,
+    // "Full server setup".gray,
+    "About",
+    "Cheat sheet",
+    "Quit".bold.red,
+];
+
 const mainMenuQuestion = {
-    type: "list",
+    type: "rawlist",
     name: "intro",
-    message: "What would you like to do?",
-    choices: [
-        "Check installed packages",
-        "Cheat sheet",
-        "Install server packages",
-        "Uninstall server packages",
-        "Full server setup",
-        "Quit",
-    ],
+    message: "\nWhat would you like to do?",
+    choices: mainMenuChoices,
+};
+
+const repeatMainMenu = {
+    type: "confirm",
+    name: "repeat",
+    message: "Return to menu? (yes)",
+    default: true,
 };
 
 const mainMenuPrompt = (question) => {
-    return inquirer.prompt(question).then((answer) => {
+    inquirer.prompt(question).then((answer) => {
         switch (answer.intro) {
             case "Check installed packages":
                 introOptions.checkInstalled();
-                mainMenuPrompt(mainMenuQuestion);
+                inquirer.prompt(repeatMainMenu).then((repeatMenu) => {
+                    if (repeatMenu.repeat) {
+                        mainMenuPrompt(mainMenuQuestion);
+                    } else {
+                        console.log("See ya later".trap);
+                    }
+                });
                 break;
             case "Cheat sheet":
                 cheatSheet();
                 mainMenuPrompt(mainMenuQuestion);
                 break;
-            case "Quit":
+            case "Configuration":
+                configuration();
+                break;
+            case "About":
+                aboutOption();
+            case "Quit".bold.red:
+                break;
+            default:
+                console.log(answer.intro);
+                console.log("See ya later".rainbow);
                 break;
         }
     });
 };
 
 mainMenuPrompt(mainMenuQuestion);
-
-// function green(string) {
-//   if (typeof string == "object") {
-//     // console.log(chalk.green(JSON.stringify(string)));
-//     log(require("util").inspect(string, { colors: true, depth: null }));
-//   } else log(chalk.green(string));
-// }
-
-// inquirer.prompt(intro).then((answer) => {
-//     colors.green(answer);
-//     while (answer.intro != "Quit") {
-//         switch (answer.intro) {
-//             case "Check installed packages":
-//                 introOptions.checkInstalled();
-//                 break;
-//             case "Cheat sheet":
-//                 cheatSheet();
-//                 break;
-//         }
-//     }
-// });
